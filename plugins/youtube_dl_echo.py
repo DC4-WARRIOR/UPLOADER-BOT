@@ -22,39 +22,37 @@ from helper_funcs.display_progress import progress_for_pyrogram, humanbytes, Tim
 async def echo(bot, update):
     await AddUser(bot, update)
     imog = await update.reply_text("Processing...⚡", reply_to_message_id=update.message_id)
-    youtube_dl_username = None
-    youtube_dl_password = None
+    username = None
+    password = None
     file_name = None
-    url = update.text
+    incoming = update.text
     if "|" in url:
-        url_parts = url.split("|")
-        if len(url_parts) == 2:
+        uriarts = incoming.split("|")
+        if len(uriarts) == 2:
+            url = uriarts[0]
+            file_name = uriarts[1]
+        elif len(uriarts) == 4:
             url = url_parts[0]
             file_name = url_parts[1]
-        elif len(url_parts) == 4:
-            url = url_parts[0]
-            file_name = url_parts[1]
-            youtube_dl_username = url_parts[2]
-            youtube_dl_password = url_parts[3]
+            username = url_parts[2]
+            password = url_parts[3]
         else:
             for entity in update.entities:
                 if entity.type == "text_link":
                     url = entity.url
                 elif entity.type == "url":
-                    o = entity.offset
-                    l = entity.length
-                    url = url[o:o + l]
+                    mwo = entity.offset
+                    emo = entity.length
+                    url = url[mwo:mwo + emo]
+
         if url is not None:
             url = url.strip()
         if file_name is not None:
             file_name = file_name.strip()
-        # https://stackoverflow.com/a/761825/4723940
         if youtube_dl_username is not None:
             youtube_dl_username = youtube_dl_username.strip()
         if youtube_dl_password is not None:
             youtube_dl_password = youtube_dl_password.strip()
-        logger.info(url)
-        logger.info(file_name)
     else:
         for entity in update.entities:
             if entity.type == "text_link":
@@ -109,8 +107,7 @@ async def echo(bot, update):
         if "\n" in x_reponse:
             x_reponse, _ = x_reponse.split("\n")
         response_json = json.loads(x_reponse)
-        save_ytdl_json_path = Config.DOWNLOAD_LOCATION + \
-            "/" + str(update.from_user.id) + ".json"
+        save_ytdl_json_path = Config.DOWNLOAD_LOCATION + "/" + str(update.from_user.id) + ".json"
         with open(save_ytdl_json_path, "w", encoding="utf8") as outfile:
             json.dump(response_json, outfile, ensure_ascii=False)
         # logger.info(response_json)
